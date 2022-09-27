@@ -1,0 +1,43 @@
+Maria Correa
+a)Your experience installing Nachos w/ platform details.
+I used the SSH client PuTTY to connect directly to the server Ocelot. From there I followed the instructions on the project document to install Nachos and I ran into some syntax problems. My main problem was including "<>" parenthesis where there should not have been when creating the path to the Nachos distribution.
+
+b)Your experience w/ the tests.
+The tests ran very smooth for me by following all the directions on the document. However when it came to archiving and compressing the file into a .tgz file I was at the low level directory so it would not allow me to do it. I decided to start all over and tried to make reports directory again and the linux command did not let me. But in the end I was able to do it.
+
+c)A description of the Thread class in Nachos. Please be brief.
+The threads class in nachos contain several functions such as Fork() that creates a threat, StackAllocate() which allocates memory for the stack, Yield() which allows Nachos to yield to a new thread, Sleep() which removes the thread from the ready list, and finally Finish() which terminates the current thread.
+
+Vanessa Chu
+a) your experience installing Nachos w/ platform details
+
+I first logged on to ocelot and then ssh into nachos.aul.fiu.edu from ocelot. I installed Nachos by first uploading the Nachos v3.4 source code .tar.gz file to Ocelot, unzipping the file, and then compiling it from the source code. Everything ran smoothly without error
+
+b) your experience w/ the tests
+
+The test result under the threads/ subdirectory looks exactly the same as the one shown on the project description PDF. When running the "halt" user program, it prints "Machine halting!" and the program doesn't throw any error. When running halt with "-s -x" flags, it shows a prompt with a number. If I enter any number greater than 22, it will print out the same result as the one when executing under just "-x" flag. Otherwise, it will increment the "Time" number with "Pending interrupts" underneath and show a new prompt with the incremented number.
+
+
+c) A description of the Thread class in Nachos
+
+The Thread class defined in the thread.h file inside /nachos-3.4/code/threads, and the detailed implementation of the Thread class is in the thread.cc file. This file creates a data structure for managing threads. The Thread class has four main public methods for thread operations: Fork() for creating a new thread, Yield() for relinquishing the CPU resource to another runnable thread, Sleep() to put the current thread into sleep and release the CPU resources was using, and Finish() to signal to thread is done with execution. It has a CheckOverflow() to ensure the stack is not overflowed.
+
+Ryan Jimenez
+a)	your experience installing Nachos w/ platform details, 
+
+I decided to use PUTTY to install Nachos. When I was typing on the command line
+tar  zxf  <path  to  nachos-3.4-linux.tar.gz>, I would receive an error.
+This was because the terminal could not understand the zxf.
+After some debugging, I switched the zxf to xzf and it worked perfectly.
+
+b)	your experience w/ the tests
+
+The tests went smoothly when I followed the instructions on how to run them.
+To better understand what was happening I watched the video recorded by the TA.
+The halt commands and flags worked as expected and will prompt their respected output.
+
+c)	A description of the Thread class in Nachos. Please be brief.
+
+As shown within the thread.cc file, certain factors make up the Thread class.
+It has four main public methods which include: Fork(), Yield(), Sleep(), and Finish().
+Each with their own unique thread operations to make things run easily. 
