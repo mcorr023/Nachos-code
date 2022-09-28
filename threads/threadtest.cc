@@ -39,6 +39,7 @@ void SimpleThread(int which) {
     printf("Thread %d sees final value %d\n", which, val);
 }
 
+
 #else
 
 void
@@ -80,7 +81,7 @@ ThreadTest1()
 int numThreadsActive; // used to implement barrier upon completion
 
 void
-ThreadTest(int n) {
+ThreadTest2(int n) {
     DEBUG('t', "Entering SimpleTest");
     Thread *t;
     numThreadsActive = n;

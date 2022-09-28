@@ -63,6 +63,7 @@ extern void ThreadTest(void), Copy(char *unixFile, char *nachosFile);
 extern void Print(char *file), PerformanceTest(void);
 extern void StartProcess(char *file), ConsoleTest(char *in, char *out);
 extern void MailTest(int networkID);
+extern void ThreadTest2(int n);
 
 //----------------------------------------------------------------------
 // main
@@ -104,7 +105,7 @@ main(int argc, char **argv)
 //HW1_SEMAPHORES
 
 #if defined(CHANGED) && defined(HW1_SEMAPHORES)
-	ThreadTest(0);
+	ThreadTest2(4);
 #else
     ThreadTest();
 #endif
