@@ -29,12 +29,21 @@ int SharedVariable;
 void SimpleThread(int which) {
     int num, val;
     for(num = 0; num < 5; num++) {
+
+        //entry section
         val = SharedVariable;
         printf("*** thread %d sees value %d\n", which, val);
         currentThread->Yield();
         SharedVariable = val+1;
+
+        //exit section
+
         currentThread->Yield();
         }
+
+        //Decrement numThreadsActive
+        //Check if numthreadsActive = 0; yield self while not.
+        
     val = SharedVariable;
     printf("Thread %d sees final value %d\n", which, val);
 }
