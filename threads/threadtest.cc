@@ -26,10 +26,13 @@ int testnum = 1;
 #ifdef HW1_SEMAPHORES
 
 int SharedVariable;
+int numThreadsActive;
+Semaphore *sem = new Semaphore("semaphore", 1);
 void SimpleThread(int which) {
     int num, val;
     for(num = 0; num < 5; num++) {
 
+        sem->P();
         //entry section
         val = SharedVariable;
         printf("*** thread %d sees value %d\n", which, val);
@@ -37,13 +40,17 @@ void SimpleThread(int which) {
         SharedVariable = val+1;
 
         //exit section
-
+        sem->V();
         currentThread->Yield();
         }
 
         //Decrement numThreadsActive
+        numThreadsActive--;
         //Check if numthreadsActive = 0; yield self while not.
-        
+        while(numThreadsActive != 0){
+            currentThread->Yield();
+        }
+
     val = SharedVariable;
     printf("Thread %d sees final value %d\n", which, val);
 }
