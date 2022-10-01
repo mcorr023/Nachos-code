@@ -100,7 +100,9 @@ Semaphore::V()
 // Dummy functions -- so we can compile our later assignments 
 // Note -- without a correct implementation of Condition::Wait(), 
 // the test case in the network assignment won't work!
-Lock::Lock(const char* debugName) {}
+Lock::Lock(const char* debugName) {
+    free = true;
+}
 Lock::~Lock() {}
 void Lock::Acquire() {}
 void Lock::Release() {}
