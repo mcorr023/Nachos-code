@@ -80,6 +80,11 @@ class Lock {
   private:
     char* name;				// for debugging
     // plus some other stuff you'll need to define
+    //We need a queue, similar to that of Semaphore 
+    List *queue;       // threads waiting on lock to become free
+    //Need to know if the lock is free(avaliable)
+    bool free; //Checks if lock is free
+
 };
 
 // The following class defines a "condition variable".  A condition
