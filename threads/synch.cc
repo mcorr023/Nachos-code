@@ -100,10 +100,37 @@ Semaphore::V()
 // Dummy functions -- so we can compile our later assignments 
 // Note -- without a correct implementation of Condition::Wait(), 
 // the test case in the network assignment won't work!
-Lock::Lock(const char* debugName) {}
-Lock::~Lock() {}
-void Lock::Acquire() {}
-void Lock::Release() {}
+Lock::Lock(const char* debugName) {
+    name = debugName;
+    free = true;
+    queue = new List;
+}
+Lock::~Lock() {
+    delete queue;
+}
+void Lock::Acquire() {
+
+    // Disable interrupts -- similar to Semaphore P()
+
+    //Check if lock is free and then make it unfree
+    
+    //Else check if lock is not free -- add self to queue (while to check for free)
+
+    //Enable Interrupts 
+
+}
+void Lock::Release() {
+    
+    // Disable interrupts 
+
+    //Check if thread has lock... isHeldByCurrentThread?
+
+    //if not, do nothing
+
+    //if yes, release the lock and wakeup 1 of the waiting thread in queue
+
+    //Enable interrupts
+}
 
 Condition::Condition(const char* debugName) { }
 Condition::~Condition() { }
