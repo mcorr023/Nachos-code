@@ -61,7 +61,8 @@ THREAD_C =../threads/main.cc\
 	../machine/interrupt.cc\
 	../machine/sysdep.cc\
 	../machine/stats.cc\
-	../machine/timer.cc
+	../machine/timer.cc\
+	../machine/lockTest.cc
 
 THREAD_S = ../threads/switch.s
 
