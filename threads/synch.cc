@@ -115,14 +115,19 @@ void Lock::Acquire() {
     IntStatus oldLevel = interrupt->SetLevel(IntOff);	// disable interrupts
 
     // Check if lock is free
+    if (free == true){
+        // If yes, make the lock not free anymore
+        free = false;
+        }
+    else{
+        queue->Append((void *)currentThread);
 
-    // If yes, make the lock not free anymore
-    free = false;
+    }
 
     // Else, lock is not free -- add self to queue
     // (keep checking for free lock while)
 
-    // Enable interrupts
+    (void) interrupt->SetLevel(oldLevel);	// re-enable interrupts
 }
 void Lock::Release() {
 
