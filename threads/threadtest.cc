@@ -14,6 +14,7 @@
 
 // testnum is set in main.cc
 int testnum = 1;
+numThreadsActive;
 
 //----------------------------------------------------------------------
 // SimpleThread
@@ -26,7 +27,6 @@ int testnum = 1;
 #ifdef HW1_SEMAPHORES
 
 int SharedVariable;
-int numThreadsActive;
 Semaphore *sem = new Semaphore("semaphore", 1);
 void SimpleThread(int which) {
     int num, val;
