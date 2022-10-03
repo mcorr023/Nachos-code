@@ -110,6 +110,14 @@ main(int argc, char **argv)
     ThreadTest();
 #endif
 
+//HW1_LOCKS
+#if defined(CHANGED) && defined(HW1_LOCKS)
+	LockTest();
+#else
+    ThreadTest();
+#endif
+
+
 #endif
 
     for (argc--, argv++; argc > 0; argc -= argCount, argv += argCount) {

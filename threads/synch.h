@@ -67,8 +67,7 @@ class Lock {
   public:
     Lock(const char* debugName);  		// initialize lock to be FREE
     ~Lock();				// deallocate lock
-    char* getName() { return name; }	// debugging assist
-
+    const char* getName() { return name; }	// debugging assist
     void Acquire(); // these are the only operations on a lock
     void Release(); // they are both *atomic*
 
@@ -78,8 +77,12 @@ class Lock {
 					// Condition variable ops below.
 
   private:
-    char* name;				// for debugging
+    const char* name;				// for debugging
     // plus some other stuff you'll need to define
+    //We need a queue, similar to that of Semaphore 
+    List *queue;       // threads waiting on lock to become free
+    //Need to know if the lock is free(avaliable)
+    bool free; //Checks if lock is free
 };
 
 // The following class defines a "condition variable".  A condition
@@ -119,7 +122,7 @@ class Condition {
     Condition(const char* debugName);		// initialize condition to 
 					// "no one waiting"
     ~Condition();			// deallocate the condition
-    char* getName() { return (name); }
+    const char* getName() { return (name); }
     
     void Wait(Lock *conditionLock); 	// these are the 3 operations on 
 					// condition variables; releasing the 
@@ -130,7 +133,8 @@ class Condition {
 					// these operations
 
   private:
-    char* name;
+    const char* name;
+    List *queue;  
     // plus some other stuff you'll need to define
 };
 #endif // SYNCH_H

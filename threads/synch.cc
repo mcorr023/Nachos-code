@@ -100,13 +100,89 @@ Semaphore::V()
 // Dummy functions -- so we can compile our later assignments 
 // Note -- without a correct implementation of Condition::Wait(), 
 // the test case in the network assignment won't work!
-Lock::Lock(const char* debugName) {}
-Lock::~Lock() {}
-void Lock::Acquire() {}
-void Lock::Release() {}
 
-Condition::Condition(const char* debugName) { }
-Condition::~Condition() { }
-void Condition::Wait(Lock* conditionLock) { ASSERT(FALSE); }
-void Condition::Signal(Lock* conditionLock) { }
-void Condition::Broadcast(Lock* conditionLock) { }
+Lock::Lock(const char* debugName) {
+    name = debugName;
+    free = true;
+    queue = new List;
+}
+Lock::~Lock() {
+    delete queue;
+}
+
+void Lock::Acquire() {
+
+    IntStatus oldLevel = interrupt->SetLevel(IntOff);	// disable interrupts
+
+    // Check if lock is free
+
+    // If yes, make the lock not free anymore
+    free = false;
+
+    // Else, lock is not free -- add self to queue
+    // (keep checking for free lock while)
+
+    // Enable interrupts
+}
+void Lock::Release() {
+
+    // disable interrupts
+
+    // check if thread has lock ... isHeldByCurrentThread ?
+
+    // If not, do nothing
+
+    free = true;
+
+    // If yes, release the lock and wakeup 1 of the waiting threads in queue
+
+    // enable interrupts
+
+}
+
+bool Lock::isHeldByCurrentThread() {
+
+    return true;
+
+}
+
+Condition::Condition(const char* debugName) {
+    name = debugName; // init
+    queue =  new List;
+}
+Condition::~Condition() {
+    delete queue;
+}
+
+void Condition::Wait(Lock* conditionLock) {
+
+    // check if calling thread holds the lock
+    ASSERT(conditionLock->isHeldByCurrentThread());
+
+    // Release the lock
+
+    // put self in the queue of waiting threads
+
+    // Re-acquire the lock
+
+}
+void Condition::Signal(Lock* conditionLock) {
+
+    // check if calling thread holds the lock
+    ASSERT(conditionLock->isHeldByCurrentThread());
+
+    // Dequeue one of the threads in the queue
+
+    // If thread exists, wake it up.
+
+}
+void Condition::Broadcast(Lock* conditionLock) {
+
+    // check if calling thread holds the lock
+    ASSERT(conditionLock->isHeldByCurrentThread());
+
+    // Dequeue all threads in the queue one-by-one
+
+    // Wakeup each thread
+
+ }
