@@ -115,18 +115,19 @@ void Lock::Acquire() {
     IntStatus oldLevel = interrupt->SetLevel(IntOff);	// disable interrupts
 
     // Check if lock is free
-    while (!free){
+    if(free == true){
+        free = false;
+    }
+    while (free==false){
         queue->Append((void *)currentThread);	// so go to sleep
 	    currentThread->Sleep();
     }
-
-    free = false;
 
     (void) interrupt->SetLevel(oldLevel);	// re-enable interrupts
 }
 void Lock::Release() {
 
-    // disable interrupts
+    IntStatus oldLevel = interrupt->SetLevel(IntOff);// disable interrupts
 
     // check if thread has lock ... isHeldByCurrentThread ?
 
@@ -136,7 +137,7 @@ void Lock::Release() {
 
     // If yes, release the lock and wakeup 1 of the waiting threads in queue
 
-    // enable interrupts
+    (void) interrupt->SetLevel(oldLevel);	// re-enable interrupts
 
 }
 
