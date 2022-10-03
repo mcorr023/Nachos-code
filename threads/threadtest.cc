@@ -169,5 +169,19 @@ void LockTest()
     LockT(0);
 }
 
-#endif 
+#else 
 
+void
+ThreadTest()
+{
+    switch (testnum) {
+    case 1:
+	ThreadTest1();
+	break;
+    default:
+	printf("No test specified.\n");
+	break;
+    }
+}
+
+#endif 
