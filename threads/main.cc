@@ -106,17 +106,13 @@ main(int argc, char **argv)
 //HW1_SEMAPHORES
 
 #if defined(CHANGED) && defined(HW1_SEMAPHORES)
-	ThreadTest2(4);
+	ThreadTest2(1);
+
 #else
     ThreadTest();
 #endif
 
-//HW1_LOCKS
-#if defined(CHANGED) && defined(HW1_LOCKS)
-	LockTest();
-#else
-    ThreadTest();
-#endif
+
 
 
 #endif
