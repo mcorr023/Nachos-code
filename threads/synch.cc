@@ -162,13 +162,16 @@ void Condition::Wait(Lock* conditionLock) {
 
     // check if calling thread holds the lock
     ASSERT(conditionLock->isHeldByCurrentThread());
-
-    // Release the lock
-
-    // put self in the queue of waiting threads
-
-    // Re-acquire the lock
-
+    if(conditionLock->isHeldByCurrentThread()){
+        IntStatus oldLevel = interrupt->SetLevel(IntOff);// disable interrupts
+        conditionLock->Release();
+        // put self in the queue of waiting threads
+        queue->Append((void *)currentThread);
+        currentThread->Sleep();
+        (void) interrupt->SetLevel(oldLevel);
+        // Re-acquire the lock
+        conditionLock-.Acquire();
+    }
 }
 void Condition::Signal(Lock* conditionLock) {
 
