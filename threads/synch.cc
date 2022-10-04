@@ -170,7 +170,7 @@ void Condition::Wait(Lock* conditionLock) {
         currentThread->Sleep();
         (void) interrupt->SetLevel(oldLevel);
         // Re-acquire the lock
-        conditionLock-.Acquire();
+        conditionLock-> Acquire();
     }
 }
 void Condition::Signal(Lock* conditionLock) {
