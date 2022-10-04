@@ -130,12 +130,15 @@ void Lock::Release() {
     IntStatus oldLevel = interrupt->SetLevel(IntOff);// disable interrupts
 
     // check if thread has lock ... isHeldByCurrentThread ?
-
+    if(isHeldByCurrentThread()){
+        // If yes, release the lock and wakeup 1 of the waiting threads in queue
+        Thread *wakeUp = (Thread*) queue->Remove();
+        if(wakeUp != NULL){
+            scheduler->ReadyToRun(wakeUp);
+        }
+        free = true;
+    }
     // If not, do nothing
-
-    free = true;
-
-    // If yes, release the lock and wakeup 1 of the waiting threads in queue
 
     (void) interrupt->SetLevel(oldLevel);	// re-enable interrupts
 
