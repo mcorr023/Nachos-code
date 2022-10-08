@@ -63,7 +63,7 @@ extern void ThreadTest(void), Copy(char *unixFile, char *nachosFile);
 extern void Print(char *file), PerformanceTest(void);
 extern void StartProcess(char *file), ConsoleTest(char *in, char *out);
 extern void MailTest(int networkID);
-extern void ThreadTest2(int n);
+extern void ThreadTest(int n);
 extern void LockTest(void);
 
 //----------------------------------------------------------------------
@@ -103,14 +103,18 @@ main(int argc, char **argv)
       }
     }
 
-//HW1_SEMAPHORES
 
+#if defined(CHANGED)
+#if defined(HW1_SEMAPHORES)
+	ThreadTest(4);
+#endif
+#if defined(HW1_LOCKS)
+	LockTest();
+#endif
 
-
-LockTest();
-
-
-
+#else
+    ThreadTest();
+#endif
 
 
 #endif

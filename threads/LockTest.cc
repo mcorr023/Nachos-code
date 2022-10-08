@@ -5,7 +5,6 @@
 Lock * Testl = new Lock ("MyLock");
 int Counter=0;
 
-
 void LockT(int number)
 {
     	int num, val;

@@ -71,6 +71,7 @@ SimpleThread(int which)
     }
 }
 
+
 //----------------------------------------------------------------------
 // ThreadTest1
 // 	Set up a ping-pong between two threads, by forking a thread 
@@ -97,7 +98,7 @@ ThreadTest1()
 #ifdef HW1_SEMAPHORES
 
 void
-ThreadTest2(int n) {
+ThreadTest(int n) {
     DEBUG('t', "Entering SimpleTest");
     Thread *t;
     numThreadsActive = n;
