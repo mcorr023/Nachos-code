@@ -65,6 +65,7 @@ extern void StartProcess(char *file), ConsoleTest(char *in, char *out);
 extern void MailTest(int networkID);
 extern void ThreadTest(int n);
 extern void LockTest(void);
+extern void ElevatorTest(int numFloors, int numPersons);
 
 //----------------------------------------------------------------------
 // main
@@ -105,11 +106,17 @@ main(int argc, char **argv)
 
 
 #if defined(CHANGED)
+
 #if defined(HW1_SEMAPHORES)
 	ThreadTest(4);
 #endif
+
 #if defined(HW1_LOCKS)
 	LockTest();
+#endif
+
+#if defined(HW1_ELEVATOR)
+	ElevatorTest(5,5);
 #endif
 
 #else
