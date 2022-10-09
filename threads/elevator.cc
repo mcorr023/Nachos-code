@@ -16,10 +16,14 @@ void ELEVATOR::start() {
     while(1) {
 
         // A. Wait until hailed
-
+        
         // B. While there are active persons, loop doing the following
+        while (personIDLock->isHeldByCurrentThread())
+        {
         //      0. Acquire elevatorLock
+                e->elevatorLock->Acquire();
         //      1. Signal persons inside elevator to get off (leaving->broadcast(elevatorLock))
+                
         //      2. Signal persons atFloor to get in, one at a time, checking occupancyLimit each time
         //      2.5 Release elevatorLock
         //      3. Spin for some time
@@ -28,6 +32,7 @@ void ELEVATOR::start() {
                 }
         //      4. Go to next floor
         //  printf("Elevator arrives on floor %d", )
+        }
     }
 }
 
