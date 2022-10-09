@@ -26,11 +26,13 @@ void ELEVATOR::start() {
                 
         //      2. Signal persons atFloor to get in, one at a time, checking occupancyLimit each time
         //      2.5 Release elevatorLock
+                e->elevatorLock->Release();
         //      3. Spin for some time
                 for(int j =0 ; j< 1000000; j++) {
                     currentThread->Yield();
                 }
         //      4. Go to next floor
+                ArrivingGoingFromTo(e->currentFloor, e->currentFloor + 1);
         //  printf("Elevator arrives on floor %d", )
         }
     }
