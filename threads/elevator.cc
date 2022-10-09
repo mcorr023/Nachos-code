@@ -59,8 +59,12 @@ ELEVATOR::ELEVATOR(int numFloors) {
     }
     personsWaiting = new int[numFloors];
     elevatorLock = new Lock("ElevatorLock");
-
+    
     // Initialize leaving
+    leaving = new Condition*[numFloors];
+    for (int i = 0; i < numFloors; i++) {
+        leaving[i] = new Condition("Leaving " + i);
+    }
 }
 
 
