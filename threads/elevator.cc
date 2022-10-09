@@ -18,7 +18,7 @@ void ELEVATOR::start() {
         // A. Wait until hailed
         
         // B. While there are active persons, loop doing the following
-        while (personIDLock->isHeldByCurrentThread())
+        while (e->occupancy > 0)
         {
         //      0. Acquire elevatorLock
                 e->elevatorLock->Acquire();
@@ -49,6 +49,7 @@ void ElevatorThread(int numFloors) {
 
 ELEVATOR::ELEVATOR(int numFloors) {
     currentFloor = 1;
+    occupancy = 0;
     entering = new Condition*[numFloors];
     // Initialize entering
     for (int i = 0; i < numFloors; i++) {
