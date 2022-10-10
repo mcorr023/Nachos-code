@@ -18,21 +18,21 @@ void ELEVATOR::start() {
         // A. Wait until hailed
         
         // B. While there are active persons, loop doing the following
-        while (e->occupancy > 0)
+        while (occupancy > 0)
         {
         //      0. Acquire elevatorLock
-                e->elevatorLock->Acquire();
+                elevatorLock->Acquire();
         //      1. Signal persons inside elevator to get off (leaving->broadcast(elevatorLock))
                 
         //      2. Signal persons atFloor to get in, one at a time, checking occupancyLimit each time
         //      2.5 Release elevatorLock
-                e->elevatorLock->Release();
+                elevatorLock->Release();
         //      3. Spin for some time
                 for(int j =0 ; j< 1000000; j++) {
                     currentThread->Yield();
                 }
         //      4. Go to next floor
-                ArrivingGoingFromTo(e->currentFloor, e->currentFloor + 1);
+                ArrivingGoingFromTo(currentFloor, currentFloor + 1);
         //  printf("Elevator arrives on floor %d", )
         }
     }
@@ -77,27 +77,27 @@ void Elevator(int numFloors) {
 
 void ELEVATOR::hailElevator(Person *p) {
     // 1. Increment waiting persons atFloor
-    e->personsWaiting[p->atFloor]++;
+    personsWaiting[p->atFloor]++;
     // 2. Hail Elevator
-    e->hailElevator(p);
+    hailElevator(p);
     // 2.5 Acquire elevatorLock;
-    e->elevatorLock->Acquire();
+    elevatorLock->Acquire();
     // 3. Wait for elevator to arrive atFloor [entering[p->atFloor]->wait(elevatorLock)]
-    e->entering[p->atFloor]->Wait(elevatorLock);
+    entering[p->atFloor]->Wait(elevatorLock);
     // 5. Get into elevator
     printf("Person %d got into the elevator.\n", p->id);
     // 6. Decrement persons waiting atFloor [personsWaiting[atFloor]++]
-    e->personsWaiting[p->atFloor]++;
+    personsWaiting[p->atFloor]++;
     // 7. Increment persons inside elevator [occupancy++]
-    e->occupancy++;
+    occupancy++;
     // 8. Wait for elevator to reach toFloor [leaving[p->toFloor]->wait(elevatorLock)]
-    e->leaving[p->toFloor]->Wait(elevatorLock);
+    leaving[p->toFloor]->Wait(elevatorLock);
     // 9. Get out of the elevator
     printf("Person %d got out of the elevator.\n", p->id);
     // 10. Decrement persons inside elevator
-    e->occupancy--;
+    occupancy--;
     // 11. Release elevatorLock;
-    e->elevatorLock->Release();
+    elevatorLock->Release();
 }
 
 void PersonThread(int person) {
