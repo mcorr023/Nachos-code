@@ -23,8 +23,9 @@ void ELEVATOR::start() {
         //      0. Acquire elevatorLock
                 elevatorLock->Acquire();
         //      1. Signal persons inside elevator to get off (leaving->broadcast(elevatorLock))
-                
+                leaving[currentFloor]->Broadcast(elevatorLock);
         //      2. Signal persons atFloor to get in, one at a time, checking occupancyLimit each time
+                
         //      2.5 Release elevatorLock
                 elevatorLock->Release();
         //      3. Spin for some time
@@ -33,7 +34,7 @@ void ELEVATOR::start() {
                 }
         //      4. Go to next floor
                 ArrivingGoingFromTo(currentFloor, currentFloor + 1);
-        //  printf("Elevator arrives on floor %d", )
+                printf("Elevator arrives on floor %d", currentFloor);
         }
     }
 }
