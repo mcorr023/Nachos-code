@@ -18,7 +18,7 @@ void ELEVATOR::start() {
         // A. Wait until hailed
         while (!elevatorLock->isHeldByCurrentThread())
         {
-            currentThread->Sleep();
+            currentThread->Yield();
         }
         
         // B. While there are active persons, loop doing the following
