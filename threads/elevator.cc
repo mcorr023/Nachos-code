@@ -77,18 +77,27 @@ void Elevator(int numFloors) {
 
 void ELEVATOR::hailElevator(Person *p) {
     // 1. Increment waiting persons atFloor
+    e->personsWaiting[p->atFloor]++;
     // 2. Hail Elevator
+    e->hailElevator(p);
     // 2.5 Acquire elevatorLock;
+    e->elevatorLock->Acquire();
     // 3. Wait for elevator to arrive atFloor [entering[p->atFloor]->wait(elevatorLock)]
+    e->entering[p->atFloor]->Wait(elevatorLock);
     // 5. Get into elevator
     printf("Person %d got into the elevator.\n", p->id);
     // 6. Decrement persons waiting atFloor [personsWaiting[atFloor]++]
+    e->personsWaiting[p->atFloor]++;
     // 7. Increment persons inside elevator [occupancy++]
+    e->occupancy++;
     // 8. Wait for elevator to reach toFloor [leaving[p->toFloor]->wait(elevatorLock)]
+    e->leaving[p->toFloor]->Wait(elevatorLock);
     // 9. Get out of the elevator
     printf("Person %d got out of the elevator.\n", p->id);
     // 10. Decrement persons inside elevator
+    e->occupancy--;
     // 11. Release elevatorLock;
+    e->elevatorLock->Release();
 }
 
 void PersonThread(int person) {
