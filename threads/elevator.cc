@@ -16,6 +16,10 @@ void ELEVATOR::start() {
     while(1) {
 
         // A. Wait until hailed
+        while (!elevatorLock->isHeldByCurrentThread())
+        {
+            currentThread->Sleep();
+        }
         
         // B. While there are active persons, loop doing the following
         while (occupancy > 0)
@@ -80,7 +84,7 @@ void ELEVATOR::hailElevator(Person *p) {
     // 1. Increment waiting persons atFloor
     personsWaiting[p->atFloor]++;
     // 2. Hail Elevator
-    hailElevator(p);
+        // hailElevator(p);
     // 2.5 Acquire elevatorLock;
     elevatorLock->Acquire();
     // 3. Wait for elevator to arrive atFloor [entering[p->atFloor]->wait(elevatorLock)]
