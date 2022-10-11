@@ -23,6 +23,7 @@ public:
     void hailElevator(Person *p);
     void start(int numFloors);
     int totalPersonsWaiting(int numFloors);
+    
 
 private:
     int currentFloor;

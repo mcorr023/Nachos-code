@@ -50,7 +50,7 @@ void ELEVATOR::start(int numFloors) {
                 currentFloor++;
             }
             else{
-                currentFloor--;
+            currentFloor--;
             }
             printf("Elevator arrives on floor %d", currentFloor);
         
@@ -114,6 +114,9 @@ void ELEVATOR::hailElevator(Person *p) {
     
     personsWaiting[p->atFloor]++;
     if(p->atFloor < p->toFloor){
+        directionUp = TRUE;
+    }
+    if(p->atFloor > p->toFloor){
         directionUp = FALSE;
     }
     // 1.5 Acquire elevatorLock;
