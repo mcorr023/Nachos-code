@@ -9,10 +9,10 @@ void ElevatorTest(int numFloors, int numPersons) {
     Elevator(numFloors);
 
     for (int i = 0 ; i < numPersons; i++) {
-        int atFloor = (Random() % numFloors) + 1; // choose a random atFloor
+        int atFloor = (Random() % numFloors); // choose a random atFloor
         int toFloor = -1 ;
         do {
-            toFloor = (Random() % numFloors) + 1; // choose a random toFloor
+            toFloor = (Random() % numFloors); // choose a random toFloor
         } while (atFloor == toFloor) ;
 
         ArrivingGoingFromTo(atFloor, toFloor);
