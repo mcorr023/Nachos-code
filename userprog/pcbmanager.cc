@@ -1,3 +1,5 @@
+
+
 #include "pcbmanager.h"
 
 
@@ -27,12 +29,12 @@ PCBManager::~PCBManager() {
 PCB* PCBManager::AllocatePCB() {
 
     // Aquire pcbManagerLock
-    pcbManagerLock->Acquire();
+    
 
     int pid = bitmap->Find();
 
     // Release pcbManagerLock
-    pcbManagerLock->Release();
+   
 
     ASSERT(pid != -1);
 
@@ -48,12 +50,12 @@ int PCBManager::DeallocatePCB(PCB* pcb) {
     // Check is pcb is valid -- check pcbs for pcb->pid
 
      // Aquire pcbManagerLock
-    pcbManagerLock->Acquire();
+    
 
     bitmap->Clear(pcb->pid);
 
     // Release pcbManagerLock
-    pcbManagerLock->Release();
+    
 
     delete pcbs[pcb->pid];
 

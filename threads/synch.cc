@@ -105,7 +105,6 @@ Lock::Lock(const char* debugName) {
     name = debugName;
     free = true;
     queue = new List;
-    Thread * currentHolder;
 }
 Lock::~Lock() {
     delete queue;
@@ -120,7 +119,7 @@ void Lock::Acquire() {
         queue->Append((void *)currentThread);	// so go to sleep
 	    currentThread->Sleep();
     }
-    free == false;
+    free = false;
     currentHolder = currentThread;
 
     (void) interrupt->SetLevel(oldLevel);	// re-enable interrupts

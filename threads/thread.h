@@ -43,6 +43,8 @@
 #ifdef USER_PROGRAM
 #include "machine.h"
 #include "addrspace.h"
+
+class AddrSpace;
 #endif
 
 // CPU register state to be saved on context switch.  

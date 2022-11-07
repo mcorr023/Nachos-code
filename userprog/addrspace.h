@@ -18,6 +18,7 @@
 #include "pcb.h"
 
 #define UserStackSize		1024 	// increase this as necessary!
+class PCB;
 
 class AddrSpace {
   public:
