@@ -83,7 +83,7 @@ class Lock {
     List *queue;       // threads waiting on lock to become free
     //Need to know if the lock is free(avaliable)
     bool free; //Checks if lock is free
-    Thread * currentHolder; //thread that currently holds the lock
+    Thread *currentHolder; //thread that currently holds the lock
 };
 
 // The following class defines a "condition variable".  A condition

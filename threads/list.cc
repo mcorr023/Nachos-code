@@ -128,6 +128,69 @@ List::Remove()
 }
 
 //----------------------------------------------------------------------
+// List::RemoveItem
+//      Remove matching item if it exists
+//
+// Returns:
+//	0 if successful; -1 if not
+//----------------------------------------------------------------------
+
+
+int
+List::RemoveItem(void* item) {
+    ListElement *element = first;
+    ListElement *prev = NULL;
+
+    // Handle empty list
+    if(IsEmpty()) return -1;
+
+    // Handle single item list
+    if (first == last) {
+        // single item in list
+        if (first->item == item) {
+            // item found -- list is now empty
+            first = last = NULL;
+            delete element;
+            return 0;
+        } else {
+        // Element not found
+        return -1;
+        }
+    }
+
+    // Handle list with more than one items
+    element = first;
+    prev = NULL;
+
+    do {
+        // Found item - so delete it
+        if (element->item == item) {
+            // fix some side effects of deleting
+            if (element == last) {
+                // Deleting last item
+                prev->next = NULL;
+                last = prev;
+            } else if (element == first) {
+                // Deleting first item
+                first = element->next;
+            } else {
+                // Deleting intermediate item
+                prev->next = element->next;
+            }
+            delete element;
+            return 0;
+        }
+
+        // iterate to next element
+        prev = element;
+        element = element->next;
+    } while (element != NULL);
+
+    // item not found
+    return -1;
+}
+
+//----------------------------------------------------------------------
 // List::Mapcar
 //	Apply a function to each item on the list, by walking through  
 //	the list, one element at a time.

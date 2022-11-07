@@ -15,6 +15,7 @@
 
 #include "copyright.h"
 #include "filesys.h"
+#include "pcb.h"
 
 #define UserStackSize		1024 	// increase this as necessary!
 
@@ -23,19 +24,28 @@ class AddrSpace {
     AddrSpace(OpenFile *executable);	// Create an address space,
 					// initializing it with the program
 					// stored in the file "executable"
+    AddrSpace(AddrSpace* space); // Create an address space,
+          // which is a copy of an existing one
     ~AddrSpace();			// De-allocate an address space
 
     void InitRegisters();		// Initialize user-level CPU registers,
 					// before jumping to user code
 
     void SaveState();			// Save/restore address space-specific
-    void RestoreState();		// info on a context switch 
+    void RestoreState();		// info on a context switch
+    unsigned int GetNumPages(); // get size of addr space
+    TranslationEntry* GetPageTable(); // return pageTable
+    unsigned int Translate(unsigned int virtualAddr);
+    PCB* pcb; // the process that owns this addresspace
+    bool valid; // is AddrSpace valid
+
 
   private:
     TranslationEntry *pageTable;	// Assume linear page table translation
 					// for now!
-    unsigned int numPages;		// Number of pages in the virtual 
+    unsigned int numPages;		// Number of pages in the virtual
 					// address space
+    
 };
 
 #endif // ADDRSPACE_H
