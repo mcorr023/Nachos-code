@@ -80,11 +80,22 @@ void doExit(int status) {
 }
 
 void incrementPC() {
-    int oldPCReg = machine->ReadRegister(PCReg);
+    int pc, nextpc, prevpc;
 
-    machine->WriteRegister(PrevPCReg, oldPCReg);
-    machine->WriteRegister(PCReg, oldPCReg + 4);
-    machine->WriteRegister(NextPCReg, oldPCReg + 8);
+		// Read PCs
+		prevpc = machine->ReadRegister(PrevPCReg);
+		pc = machine->ReadRegister(PCReg);
+		nextpc = machine->ReadRegister(NextPCReg);
+
+		// Update PCs
+		prevpc = pc;
+		pc = nextpc;
+		nextpc = nextpc + 4;	// PC incremented by 4 in MIPS
+
+		// Write back PCs
+		machine->WriteRegister(PrevPCReg, prevpc);
+		machine->WriteRegister(PCReg, pc);
+		machine->WriteRegister(NextPCReg, nextpc);
 }
 
 

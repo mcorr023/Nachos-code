@@ -6,6 +6,7 @@
 #include "synch.h"
 
 class PCB;
+class Lock;
 
 class PCBManager {
 
