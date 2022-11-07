@@ -4,7 +4,9 @@
             "name": "Win32",
             "includePath": [
                 "${workspaceFolder}/**",
-                "${workspaceFolder}/threads"
+                "${workspaceFolder}/threads",
+                "${workspaceFolder}/userprog",
+                "${workspaceFolder}/userprog"
             ],
             "defines": [
                 "_DEBUG",

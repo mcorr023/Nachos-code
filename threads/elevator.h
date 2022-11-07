@@ -21,16 +21,20 @@ public:
     ELEVATOR(int numFloors);
     ~ELEVATOR();
     void hailElevator(Person *p);
-    void start();
+    void start(int numFloors);
+    int totalPersonsWaiting(int numFloors);
+    
 
 private:
     int currentFloor;
     Condition **entering;
     Condition **leaving;
+    Condition *personArrived;
     int *personsWaiting;
     int occupancy;
     int maxOccupancy;
     Lock *elevatorLock;
+    bool directionUp;
 
 };
 
