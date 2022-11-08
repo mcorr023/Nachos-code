@@ -25,6 +25,9 @@
 #include "system.h"
 #include "syscall.h"
 #include "system.h"
+#include "console.h"
+#include "addrspace.h"
+#include "synch.h"
 
 //----------------------------------------------------------------------
 // ExceptionHandler
@@ -50,12 +53,10 @@
 //----------------------------------------------------------------------
 
 
-void doExit(int status) {
+void doExit(int pid) {
 
-    int pid = 99;
-
-    printf("System Call: [%d] invoked [Exit]\n", pid);
-    printf ("Process [%d] exits with [%d]\n", pid, status);
+    printf("System Call: [%d] invoked Exit\n", pid);
+    printf ("Process [%d] exits with [0]\n", pid);
 
 
     currentThread->space->pcb->exitStatus = status;
@@ -153,57 +154,60 @@ int doFork(int functionAddr) {
 
 }
 
-int doExec(char* filename) {
+int doExec(char* filename, int pid) {
+    printf("System Call: [%d] invoked Exec\n", pid);
+    printf("Exec Program: [%d] loading [%s]", pid, filename);
 
     // Use progtest.cc:StartProcess() as a guide
 
     // 1. Open the file and check validity
-    // OpenFile *executable = fileSystem->Open(filename);
-    // AddrSpace *space;
+    OpenFile *executable = fileSystem->Open(filename);
+    AddrSpace *space;
 
-    // if (executable == NULL) {
-    //     printf("Unable to open file %s\n", filename);
-    //     return -1;
-    // }
+    if (executable == NULL) {
+        printf("Unable to open file %s\n", filename);
+        return -1;
+    }
 
     // 2. Create new address space
-    // space = new AddrSpace(executable);
+    space = new AddrSpace(executable);
 
     // 3. Check if Addrspace creation was successful
-    // if(space->valid != true) {
-    // printf("Could not create AddrSpace\n");
-    //     return -1;
-    // }
+    if(space->valid != true) {
+        printf("Could not create AddrSpace\n");
+        return -1;
+    }
 
     // Steps 4 and 5 may not be necessary!!
 
     // 4. Create a new PCB for the new addrspace
     // ?. Can you reuse existing pcb?
-    // PCB* pcb = pcbManager->AllocatePCB();
+    PCB* pcb = pcbManager->AllocatePCB();
     // Initialize parent
-    // pcb->parent = currentThread->space->pcb->parent;
-    // space->pcb = pcb;
+    pcb->parent = currentThread->space->pcb->parent;
+    space->pcb = pcb;
 
     // 5. Set the thread for the new pcb
-    // pcb->thread = currentThread;
+    pcb->thread = currentThread;
 
     // 6. Delete current address space
-    // delete currentThread->space;
+    delete currentThread->space;
 
     // 7. SEt the addrspace for currentThread
-    // currentThread->space = space;
+    currentThread->space = space;
 
     // 8.     delete executable;			// close file
+    delete executable;
 
     // 9. Initialize registers for new addrspace
-    //  space->InitRegisters();		// set the initial register values
+    space->InitRegisters();		// set the initial register values
 
     // 10. Initialize the page table
-    // space->RestoreState();		// load page table register
+    space->RestoreState();		// load page table register
 
     // 11. Run the machine now that all is set up
-    // machine->Run();			// jump to the user progam
-    // ASSERT(FALSE); // Execution nevere reaches here
+    machine->Run();			// jump to the user progam
+    ASSERT(FALSE); // Execution nevere reaches here
 
     return 0;
 }
@@ -317,6 +321,7 @@ ExceptionHandler(ExceptionType which)
     } else  if ((which == SyscallException) && (type == SC_Exit)) {
         // Implement Exit system call
         doExit(machine->ReadRegister(4));
+        incrementPC();
     } else if ((which == SyscallException) && (type == SC_Fork)) {
         int ret = doFork(machine->ReadRegister(4));
         machine->WriteRegister(2, ret);
@@ -324,7 +329,7 @@ ExceptionHandler(ExceptionType which)
     } else if ((which == SyscallException) && (type == SC_Exec)) {
         int virtAddr = machine->ReadRegister(4);
         char* fileName = readString(virtAddr);
-        int ret = doExec(fileName);
+        int ret = doExec(fileName, virtAddr);
         machine->WriteRegister(2, ret);
         incrementPC();
     } else if ((which == SyscallException) && (type == SC_Join)) {
