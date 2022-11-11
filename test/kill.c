@@ -12,5 +12,5 @@ int main()
 	Yield();
 	ret = Kill(id);
 	Exit(ret);
-        return ret;
+    return ret;
 }

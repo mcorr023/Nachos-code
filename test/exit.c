@@ -4,5 +4,4 @@ int
 main()
 {
     Exit(0);
-    /* not reached */
 }

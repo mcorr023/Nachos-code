@@ -18,19 +18,15 @@ int main()
 	int i=0;
 	
 	global_cnt++;
-
 	Fork(sum);
 	Yield();
 
-
 	global_cnt++;
 	Fork(sum);
-
 	Yield();
 	
 	global_cnt++;
 	Fork(sum);
-
 	Yield();
 	
 	global_cnt++;
