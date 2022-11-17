@@ -53,14 +53,10 @@
 //----------------------------------------------------------------------
 
 
-void doExit(int pid) {
-
-    printf("System Call: [%d] invoked Exit\n", pid);
-    printf ("Process [%d] exits with [0]\n", pid);
-
-
-    currentThread->space->pcb->exitStatus = status;
-
+void doExit(int status) {
+    
+    printf("System Call: [%d] invoked Exit\n", currentThread->space->pcb->pid);
+    
     // Manage PCB memory As a parent process
     PCB* pcb = currentThread->space->pcb;
 
@@ -69,6 +65,8 @@ void doExit(int pid) {
 
     // Manage PCB memory As a child process
     if(pcb->parent == NULL) pcbManager->DeallocatePCB(pcb);
+
+    printf ("Process [%d] exits with [%d]\n", currentThread->space->pcb->pid, status);
 
     // Delete address space only after use is completed
     delete currentThread->space;
@@ -108,54 +106,68 @@ void childFunction(int pid) {
     // 2. Restore the page table for child
     currentThread->space->RestoreState();
 
-    PCReg == machine->ReadRegister(PCReg);
-    machine->WriteRegister(pid,  PCReg, currentThread->space->GetNumPages());
+
+    //PCReg == machine->ReadRegister(PCReg);
+    //machine->WriteRegister(pid,  PCReg, currentThread->space->GetNumPages());
     machine->Run();
 
 }
 
 int doFork(int functionAddr) {
 
+    unsigned int oldPC, oldPrevPC, oldNextPC;
+    unsigned int index;
+
+    printf("System Call: [%d] invoked Fork.\n", currentThread->space->pcb->pid);
+
     // 1. Check if sufficient memory exists to create new process
-    // currentThread->space->GetNumPages() <= mm->GetFreePageCount()
     // if check fails, return -1
+    if (!(currentThread->space->GetNumPages() <= mm->GetFreePageCount())){
+        return -1;
+    }
 
     // 2. SaveUserState for the parent thread
-    // currentThread->SaveUserState();
+    currentThread->SaveUserState();
 
     // 3. Create a new address space for child by copying parent address space
-    // Parent: currentThread->space
-    // childAddrSpace: new AddrSpace(currentThread->space)
+    //Parent = currentThread->space;
+    AddrSpace *childAddrSpace = new AddrSpace(currentThread->space);
 
     // 4. Create a new thread for the child and set its addrSpace
-    // childThread = new Thread("childThread")
-    // child->space = childAddSpace;
+    Thread *childThread = new Thread("childThread");
+    childThread->space = childAddrSpace;
 
     // 5. Create a PCB for the child and connect it all up
-    // pcb: pcbManager->AllocatePCB();
-    // pcb->thread = childThread
+    PCB *pcb = pcbManager->AllocatePCB();
+    pcb->thread = childThread;
     // set parent for child pcb
     // add child for parent pcb
 
     // 6. Set up machine registers for child and save it to child thread
-    // PCReg: functionAddr
-    // PrevPCReg: functionAddr-4
-    // NextPCReg: functionAddr+4
-    // childThread->SaveUserState();
+    oldPC = machine->ReadRegister(PCReg);
+    oldPrevPC = machine->ReadRegister(PrevPCReg);
+    oldNextPC = machine->ReadRegister(NextPCReg);
+    index = oldPC;
+    machine->WriteRegister(PCReg, machine->ReadRegister(4)); 
+    machine->WriteRegister(PrevPCReg, machine->ReadRegister(4)-4); 
+    machine->WriteRegister(NextPCReg, machine->ReadRegister(4)+4); 
+
+    childThread->SaveUserState();
+
+    printf("Process [%d] Fork: start at address [0x%x] with [%d] pages memory\n", currentThread->space->pcb->pid, machine->ReadRegister(4), currentThread->space->GetNumPages());
 
     // 7. Restore register state of parent user-level process
-    // currentThread->RestoreUserState()
+    currentThread->RestoreUserState();
 
     // 8. Call thread->fork on Child
-    // childThread->Fork(childFunction, pcb->pid)
+    childThread->Fork(childFunction, pcb->pid);
 
-    // 9. return pcb->pid;
+    return pcb->pid;
 
 }
 
-int doExec(char* filename, int pid) {
-    printf("System Call: [%d] invoked Exec\n", pid);
-    printf("Exec Program: [%d] loading [%s]", pid, filename);
+int doExec(char* filename) {
+    printf("System Call: [%d] invoked Exec\n", currentThread->space->pcb->pid);
 
     // Use progtest.cc:StartProcess() as a guide
 
@@ -165,6 +177,8 @@ int doExec(char* filename, int pid) {
 
     if (executable == NULL) {
         printf("Unable to open file %s\n", filename);
+        incrementPC();
+        machine->WriteRegister(2,-1);
         return -1;
     }
 
@@ -174,6 +188,7 @@ int doExec(char* filename, int pid) {
     // 3. Check if Addrspace creation was successful
     if(space->valid != true) {
         printf("Could not create AddrSpace\n");
+        incrementPC();
         return -1;
     }
 
@@ -205,6 +220,7 @@ int doExec(char* filename, int pid) {
     space->RestoreState();		// load page table register
 
     // 11. Run the machine now that all is set up
+    printf("Exec Program: [%d] loading [%s]", currentThread->space->pcb->pid, filename);
     machine->Run();			// jump to the user progam
     ASSERT(FALSE); // Execution nevere reaches here
 
@@ -214,9 +230,10 @@ int doExec(char* filename, int pid) {
 
 int doJoin(int pid) {
 
+
+    PCB* joinPCB = pcbManager->GetPCB(currentThread->space->pcb->pid);
+    if (joinPCB == NULL) {
     // 1. Check if this is a valid pid and return -1 if not
-    PCB* joinPCB = pcbManager->GetPCB(pid);
-    if (pcb == NULL) {
         return -1;
     }
 
@@ -227,7 +244,8 @@ int doJoin(int pid) {
     }
 
     // 3. Yield until joinPCB has not exited
-    while(!joinPCB->hasExited) {
+
+    while(!joinPCB->HasExited()) {
         currentThread->Yield();
     }
 
@@ -265,6 +283,7 @@ int doKill (int pid) {
 
 
 void doYield() {
+    printf("System Call: [%d] invoked Yield.\n", currentThread->space->pcb->pid);
     currentThread->Yield();
 }
 
@@ -321,8 +340,8 @@ ExceptionHandler(ExceptionType which)
     int type = machine->ReadRegister(2);
 
     if ((which == SyscallException) && (type == SC_Halt)) {
-	DEBUG('a', "Shutdown, initiated by user program.\n");
-   	interrupt->Halt();
+        DEBUG('a', "Shutdown, initiated by user program.\n");
+        interrupt->Halt();
     } else  if ((which == SyscallException) && (type == SC_Exit)) {
         // Implement Exit system call
         doExit(machine->ReadRegister(4));
@@ -334,7 +353,7 @@ ExceptionHandler(ExceptionType which)
     } else if ((which == SyscallException) && (type == SC_Exec)) {
         int virtAddr = machine->ReadRegister(4);
         char* fileName = readString(virtAddr);
-        int ret = doExec(fileName, virtAddr);
+        int ret = doExec(fileName);
         machine->WriteRegister(2, ret);
         incrementPC();
     } else if ((which == SyscallException) && (type == SC_Join)) {

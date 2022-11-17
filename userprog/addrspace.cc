@@ -87,6 +87,8 @@ AddrSpace::AddrSpace(OpenFile *executable)
         valid = false;
         return;
     }
+    
+    printf("Loaded Program: [%d] code | [%d] data | [%d] bss\n", noffH.code.size, noffH.initData.size, noffH.uninitData.size);
 
     // Allocate a new PCB for the address space
     pcb = pcbManager->AllocatePCB();
