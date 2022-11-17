@@ -103,15 +103,14 @@ void incrementPC() {
 void childFunction(int pid) {
 
     // 1. Restore the state of registers
-    // currentThread->RestoreUserState()
+    currentThread->RestoreUserState();
 
     // 2. Restore the page table for child
-    // currentThread->space->RestoreState()
+    currentThread->space->RestoreState();
 
-    // PCReg == machine->ReadRegister(PCReg)
-    // print message for child creation (pid,  PCReg, currentThread->space->GetNumPages())
-
-    // machine->Run();
+    PCReg == machine->ReadRegister(PCReg);
+    machine->WriteRegister(pid,  PCReg, currentThread->space->GetNumPages());
+    machine->Run();
 
 }
 
@@ -216,21 +215,27 @@ int doExec(char* filename, int pid) {
 int doJoin(int pid) {
 
     // 1. Check if this is a valid pid and return -1 if not
-    // PCB* joinPCB = pcbManager->GetPCB(pid);
-    // if (pcb == NULL) return -1;
+    PCB* joinPCB = pcbManager->GetPCB(pid);
+    if (pcb == NULL) {
+        return -1;
+    }
 
     // 2. Check if pid is a child of current process
-    // PCB* pcb = currentThread->space->pcb;
-    // if (pcb != joinPCB->parent) return -1;
+    PCB* pcb = currentThread->space->pcb;
+    if (pcb != joinPCB->parent) {
+        return -1;
+    }
 
     // 3. Yield until joinPCB has not exited
-    // while(!joinPCB->hasExited) currentThread->Yield();
+    while(!joinPCB->hasExited) {
+        currentThread->Yield();
+    }
 
     // 4. Store status and delete joinPCB
-    // int status = joinPCB->exitStatus;
-    // delete joinPCB;
+    int status = joinPCB->exitStatus;
+    delete joinPCB;
 
-    // 5. return status;
+    return status;
 
 }
 
@@ -238,14 +243,14 @@ int doJoin(int pid) {
 int doKill (int pid) {
 
     // 1. Check if the pid is valid and if not, return -1
-    // PCB* joinPCB = pcbManager->GetPCB(pid);
-    // if (pcb == NULL) return -1;
+    //PCB* joinPCB = pcbManager->GetPCB(pid);
+    //if (pcb == NULL) return -1;
 
     // 2. IF pid is self, then just exit the process
-    // if (pcb == currentThread->space->pcb) {
-    //         doExit(0);
-    //         return 0;
-    // }
+    //if (pcb == currentThread->space->pcb) {
+    //       doExit(0);
+    //       return 0;
+    //}
 
     // 3. Valid kill, pid exists and not self, do cleanup similar to Exit
     // However, change references from currentThread to the target thread
