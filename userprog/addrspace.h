@@ -39,6 +39,7 @@ class AddrSpace {
     unsigned int Translate(unsigned int virtualAddr);
     PCB* pcb; // the process that owns this addresspace
     bool valid; // is AddrSpace valid
+    
 
 
   private:
