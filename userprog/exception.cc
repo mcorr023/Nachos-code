@@ -64,9 +64,9 @@ void doExit(int status) {
     pcb->DeleteExitedChildrenSetParentNull();
 
     // Manage PCB memory As a child process
+    printf ("Process [%d] exits with [%d]\n", currentThread->space->pcb->pid, status);
     if(pcb->parent == NULL) pcbManager->DeallocatePCB(pcb);
 
-    printf ("Process [%d] exits with [%d]\n", currentThread->space->pcb->pid, status);
 
     // Delete address space only after use is completed
     delete currentThread->space;
@@ -79,22 +79,12 @@ void doExit(int status) {
 }
 
 void incrementPC() {
-    int pc, nextpc, prevpc;
-
-		// Read PCs
-		prevpc = machine->ReadRegister(PrevPCReg);
-		pc = machine->ReadRegister(PCReg);
-		nextpc = machine->ReadRegister(NextPCReg);
-
-		// Update PCs
-		prevpc = pc;
-		pc = nextpc;
-		nextpc = nextpc + 4;	// PC incremented by 4 in MIPS
-
-		// Write back PCs
-		machine->WriteRegister(PrevPCReg, prevpc);
-		machine->WriteRegister(PCReg, pc);
-		machine->WriteRegister(NextPCReg, nextpc);
+    int counter;
+    counter = machine->ReadRegister(PCReg);
+    counter += 4;
+    machine->WriteRegister(PrevPCReg, counter-4);
+    machine->WriteRegister(PCReg, counter);
+    machine->WriteRegister(NextPCReg, counter+4);
 }
 
 
@@ -105,7 +95,6 @@ void childFunction(int pid) {
 
     // 2. Restore the page table for child
     currentThread->space->RestoreState();
-
 
     //PCReg == machine->ReadRegister(PCReg);
     //machine->WriteRegister(pid,  PCReg, currentThread->space->GetNumPages());
@@ -122,7 +111,9 @@ int doFork(int functionAddr) {
 
     // 1. Check if sufficient memory exists to create new process
     // if check fails, return -1
+    
     if (!(currentThread->space->GetNumPages() <= mm->GetFreePageCount())){
+        machine->WriteRegister(2, -1);
         return -1;
     }
 
@@ -130,7 +121,8 @@ int doFork(int functionAddr) {
     currentThread->SaveUserState();
 
     // 3. Create a new address space for child by copying parent address space
-    //Parent = currentThread->space;
+    //parent = currentThread->space;
+    
     AddrSpace *childAddrSpace = new AddrSpace(currentThread->space);
 
     // 4. Create a new thread for the child and set its addrSpace
@@ -138,11 +130,16 @@ int doFork(int functionAddr) {
     childThread->space = childAddrSpace;
 
     // 5. Create a PCB for the child and connect it all up
-    PCB *pcb = pcbManager->AllocatePCB();
-    pcb->thread = childThread;
+    PCB *childpcb = pcbManager->AllocatePCB();
+    childpcb->thread = childThread;
+    childAddrSpace->pcb = childpcb;
+    
     // set parent for child pcb
+    childpcb->parent = currentThread->space->pcb;
     // add child for parent pcb
-
+    currentThread->space->pcb->AddChild(childpcb);
+    
+    mmLock->Acquire();
     // 6. Set up machine registers for child and save it to child thread
     oldPC = machine->ReadRegister(PCReg);
     oldPrevPC = machine->ReadRegister(PrevPCReg);
@@ -152,18 +149,23 @@ int doFork(int functionAddr) {
     machine->WriteRegister(PrevPCReg, machine->ReadRegister(4)-4); 
     machine->WriteRegister(NextPCReg, machine->ReadRegister(4)+4); 
 
-    childThread->SaveUserState();
-
-    printf("Process [%d] Fork: start at address [0x%x] with [%d] pages memory\n", currentThread->space->pcb->pid, machine->ReadRegister(4), currentThread->space->GetNumPages());
-
+    childThread->SaveUserState(); 
+    
     // 7. Restore register state of parent user-level process
-    currentThread->RestoreUserState();
 
     // 8. Call thread->fork on Child
-    childThread->Fork(childFunction, pcb->pid);
+    childThread->Fork(childFunction, 1);
+    printf("Process [%d] Fork: start at address [0x%x] with [%d] pages memory\n", currentThread->space->pcb->pid, machine->ReadRegister(4), currentThread->space->GetNumPages());
+   
+    machine->WriteRegister(PCReg, oldPC); 
+    machine->WriteRegister(PrevPCReg, oldPrevPC); 
+    machine->WriteRegister(NextPCReg, oldNextPC); 
 
-    return pcb->pid;
+    currentThread->RestoreUserState();
+    machine->WriteRegister(2, childpcb->pid);
 
+    mmLock->Release();
+    return childpcb->pid;
 }
 
 int doExec(char* filename) {
@@ -181,6 +183,9 @@ int doExec(char* filename) {
         machine->WriteRegister(2,-1);
         return -1;
     }
+    // 6. Delete current address space
+    PCB* pcb = currentThread->space->pcb;
+    delete currentThread->space;
 
     // 2. Create new address space
     space = new AddrSpace(executable);
@@ -196,16 +201,12 @@ int doExec(char* filename) {
 
     // 4. Create a new PCB for the new addrspace
     // ?. Can you reuse existing pcb?
-    PCB* pcb = pcbManager->AllocatePCB();
+    
     // Initialize parent
-    pcb->parent = currentThread->space->pcb->parent;
     space->pcb = pcb;
 
     // 5. Set the thread for the new pcb
     pcb->thread = currentThread;
-
-    // 6. Delete current address space
-    delete currentThread->space;
 
     // 7. SEt the addrspace for currentThread
     currentThread->space = space;
@@ -220,7 +221,7 @@ int doExec(char* filename) {
     space->RestoreState();		// load page table register
 
     // 11. Run the machine now that all is set up
-    printf("Exec Program: [%d] loading [%s]", currentThread->space->pcb->pid, filename);
+    printf("Exec Program: [%d] loading [%s]\n", currentThread->space->pcb->pid, filename);
     machine->Run();			// jump to the user progam
     ASSERT(FALSE); // Execution nevere reaches here
 
@@ -345,7 +346,7 @@ ExceptionHandler(ExceptionType which)
     } else  if ((which == SyscallException) && (type == SC_Exit)) {
         // Implement Exit system call
         doExit(machine->ReadRegister(4));
-        incrementPC();
+    
     } else if ((which == SyscallException) && (type == SC_Fork)) {
         int ret = doFork(machine->ReadRegister(4));
         machine->WriteRegister(2, ret);

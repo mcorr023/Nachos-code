@@ -206,7 +206,10 @@ AddrSpace::AddrSpace(AddrSpace* space) {
 
 AddrSpace::~AddrSpace()
 {
-   delete pageTable;
+    for(int i = 0; i<numPages; i++){
+        mm->DeallocatePage(pageTable[i].physicalPage);
+    }
+    delete pageTable;
 }
 
 //----------------------------------------------------------------------
@@ -275,3 +278,5 @@ unsigned int AddrSpace::Translate(unsigned int virtualAddr) {
         int physicalAddr = frameNumber*PageSize + pageOffset;
         return physicalAddr;
 }
+
+
