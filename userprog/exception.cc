@@ -262,21 +262,21 @@ int doJoin(int pid) {
 int doKill (int pid) {
 
     // 1. Check if the pid is valid and if not, return -1
-    //PCB* joinPCB = pcbManager->GetPCB(pid);
-    //if (pcb == NULL) return -1;
+    PCB* joinPCB = pcbManager->GetPCB(pid);
+    if (pcb == NULL) return -1;
 
     // 2. IF pid is self, then just exit the process
-    //if (pcb == currentThread->space->pcb) {
-    //       doExit(0);
-    //       return 0;
-    //}
+    if (pcb == currentThread->space->pcb) {
+           doExit(0);
+           return 0;
+    }
 
     // 3. Valid kill, pid exists and not self, do cleanup similar to Exit
     // However, change references from currentThread to the target thread
     // pcb->thread is the target thread
 
     // 4. Set thread to be destroyed.
-    // scheduler->RemoveThread(pcb->thread);
+    scheduler->RemoveThread(pcb->thread);
 
     // 5. return 0 for success!
 }
